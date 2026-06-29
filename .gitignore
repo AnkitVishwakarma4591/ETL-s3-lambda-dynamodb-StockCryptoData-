@@ -10,3 +10,6 @@ trust-policy.json
 s3-notification.json
 test-event.json
 response.json
+pipeline.json
+codepipeline-trust.json
+codebuild-trust.json
