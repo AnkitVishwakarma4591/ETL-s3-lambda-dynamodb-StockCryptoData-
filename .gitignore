@@ -6,3 +6,7 @@ package/
 .ipynb_checkpoints/
 *.pem
 *.key
+trust-policy.json
+s3-notification.json
+test-event.json
+response.json
