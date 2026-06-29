@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"total_input_records\": 8, \"inserted_records\": 5, \"rejected_records\": 3, \"timestamp\": \"2026-06-29T19:16:49.730818+00:00\", \"source_file\": \"s3://stock-etl-raw-bucket-664418971221/raw/sample_raw_data.csv\"}"}

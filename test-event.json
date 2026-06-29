@@ -1,0 +1,14 @@
+{
+  "Records": [
+    {
+      "s3": {
+        "bucket": {
+          "name": "stock-etl-raw-bucket-664418971221"
+        },
+        "object": {
+          "key": "raw/sample_raw_data.csv"
+        }
+      }
+    }
+  ]
+}
