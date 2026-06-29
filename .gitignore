@@ -13,3 +13,5 @@ response.json
 pipeline.json
 codepipeline-trust.json
 codebuild-trust.json
+pipeline-status.txt
+git
