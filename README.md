@@ -1,138 +1,314 @@
-# Stock/Crypto Data ETL Pipeline - Serverless AWS
+# 🚀 Stock/Crypto Data Serverless ETL Pipeline with CI/CD
 
-## Project Title
+<p align="center">
+A production-style <b>Serverless ETL Pipeline</b> built on AWS that automatically extracts, transforms, and loads Stock/Crypto market data using Amazon S3, AWS Lambda, Amazon DynamoDB, and a complete CI/CD pipeline powered by GitHub Actions and AWS CodePipeline. Includes a <b>file-type based routing enhancement</b> that dynamically invokes a dedicated Lambda parser depending on whether the incoming file is CSV or JSON.
+</p>
 
-Real-World Serverless ETL Pipeline for Stock/Crypto Market Data
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/AWS-Lambda-FF9900?style=for-the-badge&logo=awslambda&logoColor=white">
+  <img src="https://img.shields.io/badge/Amazon-S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
+  <img src="https://img.shields.io/badge/Amazon-DynamoDB-4053D6?style=for-the-badge&logo=amazondynamodb&logoColor=white">
+</p>
 
-## Dataset Source
+<p align="center">
+  <img src="https://img.shields.io/badge/GitHub-Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
+  <img src="https://img.shields.io/badge/AWS-CodeBuild-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white">
+  <img src="https://img.shields.io/badge/AWS-CodePipeline-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
+</p>
 
-Sample stock and cryptocurrency market data including symbols like AAPL, GOOGL, MSFT, TSLA, AMZN, BTC, ETH.
+---
 
-## Scenario
+## 🏗️ Architecture Overview
 
-Raw stock/crypto price records are uploaded to Amazon S3. An AWS Lambda function is triggered automatically, validates and transforms the data, then loads clean records into Amazon DynamoDB for analytics and dashboarding.
+```text
+                    STOCK/CRYPTO SERVERLESS ETL PIPELINE
 
-## Architecture
+                                  GitHub
+                                     │
+                                     ▼
+                           GitHub Actions (CI)
+                            Validate •  Build
+                                     │
+                                     ▼
+                             AWS CodeBuild
+                          Install • Test • Package
+                                     │
+                                     ▼
+                           AWS CodePipeline
+                              Source & Build
+                                     │
+──────────────────────────────────────────────────────────────────────
 
-Third-Party Data -> S3 (raw/) -> Lambda ETL -> DynamoDB (clean\_records) -> CloudWatch Logs
+Stock/Crypto Dataset (CSV / JSON)
+             │
+             ▼
+      Amazon S3 Bucket
+     (raw/ Data Storage)
+             │
+      S3 Object Created
+             │
+             ▼
+      AWS Router Lambda
+   (Detects File Extension)
+             │
+     ┌───────┴────────┐
+     │                │
+     ▼                ▼
+ CSV Processor    JSON Processor
+   Lambda            Lambda
+     │                │
+     └───────┬────────┘
+             ▼
+   Amazon DynamoDB Table
+      (clean_records)
+             │
+             ▼
+   Amazon CloudWatch Logs
+      Metrics • Logs • Audit
+```
+
+---
+
+## Project Overview
+
+This project demonstrates a **Serverless ETL Pipeline** built on AWS for processing Stock and Cryptocurrency market data, enhanced with **file-type based Lambda routing**.
+
+### Features
+
+- Event-driven ETL using AWS Lambda
+- Raw data stored in Amazon S3
+- Clean records stored in Amazon DynamoDB
+- File-type aware routing: a Router Lambda inspects the file extension and invokes the correct downstream parser Lambda
+- Dedicated parsers for CSV and JSON data formats
+- CloudWatch monitoring and audit logging
+- GitHub Actions for CI
+- AWS CodeBuild for build validation
+- AWS CodePipeline for CI/CD automation
+
+### Workflow
+
+```text
+Upload Dataset (CSV or JSON)
+      │
+      ▼
+Amazon S3 (raw/)
+      │
+      ▼
+Router Lambda (detects file type)
+      │
+      ├──► CSV Processor Lambda
+      │
+      └──► JSON Processor Lambda
+      │
+      ▼
+Validate → Clean → Transform
+      │
+      ▼
+Amazon DynamoDB
+      │
+      ▼
+CloudWatch Logs
+```
+
+---
+
+## ETL Workflow
+
+```mermaid
+flowchart LR
+
+A[Raw Dataset] --> B[Amazon S3]
+B --> C[Router Lambda]
+
+C -->|.csv| D[CSV Processor Lambda]
+C -->|.json| E[JSON Processor Lambda]
+
+D --> F[Extract]
+E --> F[Extract]
+F --> G[Transform]
+G --> H[Load]
+
+H --> I[Amazon DynamoDB]
+I --> J[CloudWatch Logs]
+```
+
+| Stage | Description |
+|--------|-------------|
+| Route | Router Lambda detects file extension and invokes the matching parser Lambda |
+| Extract | Read raw stock/crypto data from Amazon S3 |
+| Transform | Validate, clean, standardize fields, and derive `price_category` |
+| Load | Store processed records in DynamoDB with `source_type` (CSV/JSON) |
+| Audit | Generate execution logs and audit summary in CloudWatch |
+
+---
 
 ## AWS Services Used
 
-* Amazon S3 - Raw data storage
-* AWS Lambda - ETL processing
-* Amazon DynamoDB - Clean records storage
-* AWS IAM - Least privilege role for Lambda
-* AWS CloudWatch - Audit logs
-* AWS CodePipeline - CI/CD pipeline
-* AWS CodeBuild - Build and syntax validation
+| Service | Purpose |
+|----------|---------|
+| Amazon S3 | Store raw stock/crypto dataset (CSV & JSON) |
+| AWS Lambda | Router, CSV processor, and JSON processor functions |
+| Amazon DynamoDB | Store cleaned records (`clean_records` table) |
+| Amazon CloudWatch | Monitor Lambda execution and audit logs |
+| AWS IAM | Manage least-privilege permissions per function |
+| GitHub | Source code management |
+| GitHub Actions | Continuous Integration |
+| AWS CodeBuild | Build validation |
+| AWS CodePipeline | Continuous Delivery |
 
-## ETL Rules
+---
 
-### Extract
+## Lambda Functions
 
-* Reads raw CSV file from S3 bucket under raw/ prefix
+| Function | Role |
+|-----------|------|
+| `stock-etl-router` | Triggered by S3; inspects file extension and invokes the matching processor |
+| `stock-etl-csv-processor` | Parses, validates, and loads CSV stock/crypto records |
+| `stock-etl-json-processor` | Parses, validates, and loads JSON stock/crypto records |
 
-### Transform
-
-* Rejects records with missing symbol
-* Rejects records with invalid or negative price
-* Rejects records with missing volume
-* Standardizes symbol to UPPERCASE
-* Standardizes currency to UPPERCASE
-* Adds derived field price\_category: HIGH (>=1000), MEDIUM (>=100), LOW (<100)
-
-### Load
-
-* Writes clean records to DynamoDB table clean\_records
-* Adds processed\_at timestamp to each record
-
-### Audit
-
-* Logs total input records, inserted records, rejected records, timestamp, and source file
+---
 
 ## DynamoDB Table Design
 
-* Table Name: clean\_records
-* Partition Key: record\_id (String)
-* Capacity Mode: On-demand
+- **Table Name:** `clean_records`
+- **Partition Key:** `record_id` (String)
+- **Capacity Mode:** On-demand
+- **Additional Fields:** `symbol`, `price`, `volume`, `currency`, `price_category`, `source_type`, `processed_at`
 
-## Testing Steps
+---
 
-1. Upload sample\_data/sample\_raw\_data.csv to S3 under raw/ prefix
-2. Lambda triggers automatically via S3 event
-3. Check CloudWatch logs for audit summary
-4. Verify clean records in DynamoDB console
+## Project Structure
 
-## GitHub Actions Summary
+```text
+etl-s3-lambda-dynamodb/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
+├── sample_data/
+│   ├── sample_raw_data.csv
+│   └── sample_raw_data.json
+│
+├── screenshots/
+│   ├── s3.png
+│   ├── cloudwatch.png
+│   ├── dynamodb.png
+│   ├── github-actions.png
+│   └── codepipeline.png
+│
+├── lambda_function.py
+├── router_lambda.py
+├── csv_processor.py
+├── json_processor.py
+├── requirements.txt
+├── buildspec.yml
+├── .gitignore
+└── README.md
+```
 
-* Triggers on push or pull request to main branch
-* Sets up Python 3.11
-* Installs dependencies from requirements.txt
-* Validates Lambda syntax using py\_compile
+---
 
-## AWS CodePipeline Summary
+## Project Screenshots
 
-* Source Stage: Connected to GitHub repository
-* Build Stage: AWS CodeBuild runs buildspec.yml
-* Validates Lambda syntax and packages artifacts
+### Amazon S3 (Raw Dataset)
 
+Raw stock/crypto dataset uploaded to Amazon S3 under the `raw/` prefix.
 
+<p align="center">
+<img src="<-- paste link -->" width="900">
+</p>
 
-\## Enhancement: File-Type Based Lambda Routing
+---
 
+### AWS Lambda Execution Logs
 
+CloudWatch logs showing the Router Lambda detecting file type and routing to the correct processor Lambda.
 
-This project includes an enhancement where a dedicated Router Lambda inspects the
+<p align="center">
+<img src="<-- paste link -->" width="900">
+</p>
 
-incoming file's extension and dynamically invokes the correct downstream Lambda
+---
 
-function for processing, instead of using a single monolithic Lambda for all file types.
+### Amazon DynamoDB
 
+Processed records stored in the `clean_records` table, tagged with `source_type` (CSV/JSON).
 
+<p align="center">
+<img src="<-- paste link -->" width="900">
+</p>
 
-\### Architecture
+---
 
-S3 (raw/) -> Router Lambda (stock-etl-router) -> CSV Lambda (stock-etl-csv-processor) OR JSON Lambda (stock-etl-json-processor) -> DynamoDB
+### GitHub Actions
 
+Continuous Integration workflow executed successfully.
 
+<p align="center">
+<img src="<-- paste link -->" width="900">
+</p>
 
-\### How it works
+---
 
-1\. A file is uploaded to the S3 bucket under the raw/ prefix.
+### AWS CodePipeline
 
-2\. The S3 event triggers the Router Lambda (stock-etl-router).
+End-to-end CI/CD pipeline execution (Source → Build).
 
-3\. The Router Lambda reads the file extension from the object key.
+<p align="center">
+<img src="<-- paste link -->" width="900">
+</p>
 
-4\. Based on the extension, it invokes the matching processor Lambda using boto3's
+---
 
-&#x20;  Lambda invoke API, passing the bucket and key as payload.
+## Running Locally
 
-5\. The processor Lambda (CSV or JSON) extracts, transforms, validates, and loads
+Clone the repository:
 
-&#x20;  clean records into DynamoDB, tagging each record with a source\_type field
+```bash
+git clone https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-.git
+```
 
-&#x20;  (CSV or JSON) for traceability.
+Move into the project directory:
 
+```bash
+cd ETL-s3-lambda-dynamodb-StockCryptoData-
+```
 
+Install dependencies:
 
-\### Lambda Functions
+```bash
+pip install -r requirements.txt
+```
 
-\- stock-etl-router: Routes events based on file extension (.csv / .json)
+Validate the Lambda functions locally:
 
-\- stock-etl-csv-processor: Parses and validates CSV files
+```bash
+python -m py_compile lambda_function.py
+python -m py_compile router_lambda.py
+python -m py_compile csv_processor.py
+python -m py_compile json_processor.py
+```
 
-\- stock-etl-json-processor: Parses and validates JSON array files
+---
 
+## 🚀 Future Improvements
 
+- Schedule automated ETL execution using **Amazon EventBridge**.
+- Add **Amazon SNS** notifications for build and pipeline events.
+- Deploy infrastructure using **AWS CloudFormation** or **Terraform**.
+- Improve reliability with comprehensive **unit tests**.
+- Add an **XML processor Lambda** to extend the router pattern to a third file type.
+- Package and deploy Lambda functions using **AWS SAM**.
+- Add monitoring dashboards and alarms using **Amazon CloudWatch**.
 
-\### Why this design
+---
 
-\- Keeps each parser focused on a single file format, improving maintainability
+## Author
 
-\- Makes it easy to add new file types (e.g. XML) by adding a new processor Lambda
+**Ankit Vishwakarma**
 
-&#x20; and one new condition in the router, without touching existing processors
+- GitHub: https://github.com/AnkitVishwakarma4591
 
-\- Each processor Lambda follows least-privilege IAM permissions independently
-
+If you found this project helpful, consider giving it a ⭐ on GitHub.
