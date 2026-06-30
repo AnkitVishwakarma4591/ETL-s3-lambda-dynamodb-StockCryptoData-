@@ -217,7 +217,7 @@ etl-s3-lambda-dynamodb/
 Raw stock/crypto dataset uploaded to Amazon S3 under the `raw/` prefix.
 
 <p align="center">
-<img src="<-- paste link -->" width="900">
+<img src="https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-/blob/main/screenshots/sample_raw_data.png" width="900">
 </p>
 
 ---
@@ -227,7 +227,7 @@ Raw stock/crypto dataset uploaded to Amazon S3 under the `raw/` prefix.
 CloudWatch logs showing the Router Lambda detecting file type and routing to the correct processor Lambda.
 
 <p align="center">
-<img src="<-- paste link -->" width="900">
+<img src="https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-/blob/main/screenshots/Lambda%20execution.png" width="900">
 </p>
 
 ---
@@ -237,7 +237,7 @@ CloudWatch logs showing the Router Lambda detecting file type and routing to the
 Processed records stored in the `clean_records` table, tagged with `source_type` (CSV/JSON).
 
 <p align="center">
-<img src="<-- paste link -->" width="900">
+<img src="https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-/blob/main/screenshots/DynamoDB%20clean_records%20table.png" width="900">
 </p>
 
 ---
@@ -247,7 +247,7 @@ Processed records stored in the `clean_records` table, tagged with `source_type`
 Continuous Integration workflow executed successfully.
 
 <p align="center">
-<img src="<-- paste link -->" width="900">
+<img src="https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-/blob/main/screenshots/GitHub%20Actions.png" width="900">
 </p>
 
 ---
@@ -257,7 +257,7 @@ Continuous Integration workflow executed successfully.
 End-to-end CI/CD pipeline execution (Source → Build).
 
 <p align="center">
-<img src="<-- paste link -->" width="900">
+<img src="https://github.com/AnkitVishwakarma4591/ETL-s3-lambda-dynamodb-StockCryptoData-/blob/main/screenshots/AWS%20CodePipeline.png" width="900">
 </p>
 
 ---
