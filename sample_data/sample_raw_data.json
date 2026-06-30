@@ -1,0 +1,7 @@
+[
+  {"record_id": "STK101", "symbol": "btc", "price": 65000.50, "volume": 1200000, "timestamp": "2024-01-15T11:00:00", "currency": "usd"},
+  {"record_id": "STK102", "symbol": "eth", "price": 3200.75, "volume": 980000, "timestamp": "2024-01-15T11:00:00", "currency": "usd"},
+  {"record_id": "STK103", "symbol": "sol", "price": 145.20, "volume": 750000, "timestamp": "2024-01-15T11:00:00", "currency": "usd"},
+  {"record_id": "STK104", "symbol": "", "price": 50.00, "volume": 300000, "timestamp": "2024-01-15T11:00:00", "currency": "usd"},
+  {"record_id": "STK105", "symbol": "doge", "price": -0.5, "volume": 500000, "timestamp": "2024-01-15T11:00:00", "currency": "usd"}
+]

@@ -15,3 +15,6 @@ codepipeline-trust.json
 codebuild-trust.json
 pipeline-status.txt
 git
+router-log.txt
+router-log2.txt
+*.log.txt
